@@ -1,0 +1,15 @@
+{
+  "name": "clone-tabnews",
+  "version": "1.0.0",
+  "description": "projeto didático se baseando no https://www.tabnews.com.br no curso https://curso.dev",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "next": "^13.1.6",
+    "react": "^18.2.0"
+  }
+}
