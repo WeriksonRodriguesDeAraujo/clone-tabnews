@@ -4,7 +4,7 @@
   "description": "projeto didático se baseando no https://www.tabnews.com.br no curso https://curso.dev",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev"
   },
   "author": "",
   "license": "MIT",
