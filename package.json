@@ -4,12 +4,17 @@
   "description": "projeto didático se baseando no https://www.tabnews.com.br no curso https://curso.dev",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev"
+    "dev": "next dev",
+    "lint:check": "prettier --check .",
+    "lint:fix": "prettier --write ."
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "next": "^13.1.6",
     "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
   }
 }
