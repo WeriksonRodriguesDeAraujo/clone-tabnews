@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",
     "test": "npm run services:up && concurrently -k -s command-jest --hide next -n next,jest \"next dev\" \"jest --runInBand --verbose\"",
+    "posttest": "npm run services:stop",
     "test:watch": "npm run services:up && concurrently -s command-jest --hide next -n next,jest \"next dev\" \"jest --watchAll --runInBand --verbose\"",
     "services:up": "docker compose -f infra/compose.yaml up -d",
     "services:stop": "docker compose -f infra/compose.yaml stop",
