@@ -13,7 +13,9 @@ describe("GET /api/v1/migrations", () => {
       const responseBody = await response.json();
       expect(responseBody.updated_at).toBeDefined();
       expect(responseBody.database.dependencies.max_conections).toBeDefined();
-      expect(responseBody.database.dependencies.active_conections).toBeDefined();
+      expect(
+        responseBody.database.dependencies.active_conections,
+      ).toBeDefined();
       expect(responseBody.database.dependencies.version).toBeDefined();
 
       const parserUpdatedAt = new Date(responseBody.updated_at).toISOString();
