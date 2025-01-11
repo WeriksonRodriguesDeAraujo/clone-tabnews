@@ -11,7 +11,7 @@ async function query(objectQuery) {
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    await client?.end();
   }
 }
 
