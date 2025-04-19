@@ -13,11 +13,11 @@ RETURNING *
 
     const result = await database.query({
       text: query,
-      values: [request.username, request.email, request.password]
-    })
+      values: [request.username, request.email, request.password],
+    });
 
     return result.rows[0];
-  };
+  }
 
   // TODO Pode ser feito uma única validação para evitar consultas excessivas ao banco.
   await _validateUniqueEmail(request.email);
@@ -25,7 +25,7 @@ RETURNING *
 
   const newUser = await runInsertQuery(request);
   return newUser;
-};
+}
 
 async function findOneByUsername(username) {
   const query = `
@@ -41,14 +41,14 @@ LIMIT
 
   const result = await database.query({
     text: query,
-    values: [username]
-  })
+    values: [username],
+  });
 
   if (result.rowCount === 0) {
     throw new NotFoundError({
       message: "O username informado não foi encontrado no sistema.",
-      action: "Verifique se o username está digitado corretamente."
-    })
+      action: "Verifique se o username está digitado corretamente.",
+    });
   }
 
   return result.rows[0];
@@ -67,14 +67,14 @@ WHERE
 
   const result = await database.query({
     text: query,
-    values: [email]
-  })
+    values: [email],
+  });
 
   if (result.rowCount > 0) {
     throw new ValidationError({
       message: "O email informado já está sendo utilizado.",
-      action: "Utilize outro email para realizar o cadastro."
-    })
+      action: "Utilize outro email para realizar o cadastro.",
+    });
   }
 }
 
@@ -90,20 +90,20 @@ WHERE
 
   const result = await database.query({
     text: query,
-    values: [username]
-  })
+    values: [username],
+  });
 
   if (result.rowCount > 0) {
     throw new ValidationError({
       message: "O nome do usuário informado já está sendo utilizado.",
-      action: "Utilize outro nome para realizar o cadastro."
-    })
+      action: "Utilize outro nome para realizar o cadastro.",
+    });
   }
 }
 
 const user = {
   create,
-  findOneByUsername
+  findOneByUsername,
 };
 
 export default user;
