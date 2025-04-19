@@ -1,5 +1,5 @@
 import database from "infra/database.js";
-import { ValidationError } from "infra/errors.js";
+import { ValidationError, NotFoundError } from "infra/errors.js";
 
 async function create(request) {
   async function runInsertQuery(request) {
@@ -26,6 +26,33 @@ RETURNING *
   const newUser = await runInsertQuery(request);
   return newUser;
 };
+
+async function findOneByUsername(username) {
+  const query = `
+SELECT 
+  *
+FROM
+  users
+WHERE
+  LOWER(username) = LOWER($1)
+LIMIT
+  1
+;`;
+
+  const result = await database.query({
+    text: query,
+    values: [username]
+  })
+
+  if (result.rowCount === 0) {
+    throw new NotFoundError({
+      message: "O username informado não foi encontrado no sistema.",
+      action: "Verifique se o username está digitado corretamente."
+    })
+  }
+
+  return result.rows[0];
+}
 
 async function _validateUniqueEmail(email) {
   const query = `
@@ -75,7 +102,8 @@ WHERE
 }
 
 const user = {
-  create
+  create,
+  findOneByUsername
 };
 
 export default user;
