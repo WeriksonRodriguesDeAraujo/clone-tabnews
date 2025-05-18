@@ -1,4 +1,5 @@
 import database from "infra/database.js";
+import password from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
 
 async function create(request) {
@@ -22,6 +23,7 @@ RETURNING *
   // TODO Pode ser feito uma única validação para evitar consultas excessivas ao banco.
   await _validateUniqueEmail(request.email);
   await _validateUniqueUsername(request.username);
+  await _hashPasswordInObject(request);
 
   const newUser = await runInsertQuery(request);
   return newUser;
@@ -99,6 +101,11 @@ WHERE
       action: "Utilize outro nome para realizar o cadastro.",
     });
   }
+}
+
+async function _hashPasswordInObject(request) {
+  const hashedPassword = await password.hash(request.password);
+  request.password = hashedPassword; // Não é uma boa prática
 }
 
 const user = {
