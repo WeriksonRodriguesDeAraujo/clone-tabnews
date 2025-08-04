@@ -29,6 +29,33 @@ LIMIT
   return result.rows[0];
 }
 
+async function findOneByEmail(email) {
+  const query = `
+SELECT 
+  *
+FROM
+  users
+WHERE
+  LOWER(email) = LOWER($1)
+LIMIT
+  1
+;`;
+
+  const result = await database.query({
+    text: query,
+    values: [email],
+  });
+
+  if (result.rowCount === 0) {
+    throw new NotFoundError({
+      message: "O email informado não foi encontrado no sistema.",
+      action: "Verifique se o email está digitado corretamente.",
+    });
+  }
+
+  return result.rows[0];
+}
+
 async function create(userInputValues) {
   async function runInsertQuery(userInputValues) {
     const query = `
@@ -167,6 +194,7 @@ async function _hashPasswordInObject(request) {
 
 const user = {
   findOneByUsername,
+  findOneByEmail,
   create,
   update,
 };
