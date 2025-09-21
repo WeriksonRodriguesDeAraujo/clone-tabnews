@@ -1,3 +1,6 @@
+import * as cookie from "cookie";
+import session from "models/session.js";
+
 import {
   InternalServerError,
   MethodNotAllowedError,
@@ -30,11 +33,35 @@ function onNoMatchhandler(request, response) {
   response.status(publicErrorObject.statusCode).json(publicErrorObject);
 }
 
+function setSessionCookie(sessionToken, response) {
+  const setCookie = cookie.serialize("session_id", sessionToken, {
+    path: "/",
+    maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+  });
+
+  response.setHeader("Set-Cookie", setCookie);
+}
+
+function clearSessionCookie(response) {
+  const setCookie = cookie.serialize("session_id", "invalid", {
+    path: "/",
+    maxAge: -1,
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+  });
+
+  response.setHeader("Set-Cookie", setCookie);
+}
+
 const controller = {
   errorHandlers: {
     onNoMatch: onNoMatchhandler,
     onError: onErrorHandler,
   },
+  setSessionCookie,
+  clearSessionCookie,
 };
 
 export default controller;
