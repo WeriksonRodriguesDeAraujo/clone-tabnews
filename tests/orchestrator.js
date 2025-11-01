@@ -7,8 +7,11 @@ import migrator from "models/migrator.js";
 import user from "models/user.js";
 import session from "models/session.js";
 
+const emailHTTPUrl = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
+
 async function waitForAllServices() {
   await waitForWebServer();
+  await waitForEmailServer();
 }
 
 async function waitForWebServer() {
@@ -16,18 +19,33 @@ async function waitForWebServer() {
     retries: 100,
     maxTimeout: 1000,
   });
+
+  async function fetchStatusPage() {
+    const response = await fetch("http://localhost:3000/api/v1/status");
+
+    if (!response.ok) {
+      throw Error();
+    }
+  }
+}
+
+async function waitForEmailServer() {
+  return retry(fetchEmailPage, {
+    retries: 100,
+    maxTimeout: 1000,
+  });
+
+  async function fetchEmailPage() {
+    const response = await fetch(emailHTTPUrl);
+
+    if (!response.ok) {
+      throw Error();
+    }
+  }
 }
 
 async function clearDataBase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
-}
-
-async function fetchStatusPage() {
-  const response = await fetch("http://localhost:3000/api/v1/status");
-
-  if (!response.ok) {
-    throw Error();
-  }
 }
 
 async function runPendingMigrations() {
@@ -47,12 +65,35 @@ async function createSession(userId) {
   return await session.create(userId);
 }
 
+async function deleteAllEmails() {
+  await fetch(`${emailHTTPUrl}/messages`, {
+    method: "DELETE",
+  });
+}
+
+async function getLastEmail() {
+  const emailListResponse = await fetch(`${emailHTTPUrl}/messages`);
+  const emailListBody = await emailListResponse.json();
+  const lastEmailItem =
+    emailListBody.length > 1 ? emailListBody.pop() : emailListBody[0];
+
+  const emailTextResponse = await fetch(
+    `${emailHTTPUrl}/messages/${lastEmailItem.id}.plain`,
+  );
+  const emailTextBody = await emailTextResponse.text();
+
+  lastEmailItem.text = emailTextBody;
+  return lastEmailItem;
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDataBase,
   runPendingMigrations,
   createUser,
   createSession,
+  deleteAllEmails,
+  getLastEmail,
 };
 
 export default orchestrator;
